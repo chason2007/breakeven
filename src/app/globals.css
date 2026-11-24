@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Blue vs. amber: the standard colour-blind-safe pair for two series. */
+  --chart-buy: #0369a1;
+  --chart-rent: #b45309;
+  --chart-grid: #cbd5e1;
+  --chart-axis: #64748b;
+  --chart-breakeven: #475569;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #020618;
+    --surface: #0f172a;
+    --foreground: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #1e2939;
+
+    --chart-buy: #38bdf8;
+    --chart-rent: #fbbf24;
+    --chart-grid: #1e2939;
+    --chart-axis: #94a3b8;
+    --chart-breakeven: #94a3b8;
   }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Recharts renders its tooltip as a focusable wrapper; suppress the outline. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
 }

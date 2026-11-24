@@ -1,34 +1,53 @@
-import type { CalculatorResult } from "@/lib/types";
 import { formatAED } from "@/lib/format";
+import type { CalculatorResult } from "@/lib/types";
 
 interface Props {
   result: CalculatorResult;
   horizonYears: number;
 }
 
-// TODO: polish cards, add verdict copy ("Buying wins after X years"), tooltips explaining each figure.
 export function ResultsSummary({ result, horizonYears }: Props) {
-  const last = result.years.at(-1);
   const stats = [
-    { label: "Monthly cost — buy", value: formatAED(result.monthlyBuyCost) },
-    { label: "Monthly cost — rent", value: formatAED(result.monthlyRentCost) },
+    {
+      label: "Monthly — buy",
+      value: formatAED(result.monthlyBuyCost),
+      note: "Mortgage, service charge, maintenance",
+    },
+    {
+      label: "Monthly — rent",
+      value: formatAED(result.monthlyRentCost),
+      note: "Rent, housing fee, Ejari",
+    },
     {
       label: "Breakeven",
-      value: result.breakevenYear ? `Year ${result.breakevenYear}` : `Not within ${horizonYears} yrs`,
+      value: result.breakevenYear ? `Year ${result.breakevenYear}` : "Never",
+      note: result.breakevenYear
+        ? "Buying pulls ahead here"
+        : `Not within ${horizonYears} years`,
     },
-    { label: "Upfront fees", value: formatAED(result.upfrontCosts) },
-    { label: `Net cost of buying (${horizonYears} yrs)`, value: last ? formatAED(last.buyNetCost) : "—" },
-    { label: `Net cost of renting (${horizonYears} yrs)`, value: last ? formatAED(last.rentNetCost) : "—" },
+    {
+      label: "Cash to buy",
+      value: formatAED(result.upfrontCosts),
+      note: "Transaction fees, on top of the down payment",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {stats.map((s) => (
-        <div key={s.label} className="rounded-lg border border-black/10 p-4 dark:border-white/15">
-          <div className="text-xs opacity-60">{s.label}</div>
-          <div className="mt-1 text-lg font-semibold">{s.value}</div>
+        <div
+          key={s.label}
+          className="rounded-xl border border-slate-200 bg-surface p-4 dark:border-slate-800"
+        >
+          <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">{s.label}</dt>
+          <dd className="mt-1.5 text-xl font-semibold tabular-nums tracking-tight sm:text-2xl">
+            {s.value}
+          </dd>
+          <p className="mt-1.5 text-[11px] leading-snug text-slate-500 dark:text-slate-400">
+            {s.note}
+          </p>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }

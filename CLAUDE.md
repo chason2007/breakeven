@@ -9,8 +9,10 @@ Portfolio project: Next.js 16 (App Router) + TypeScript + Tailwind v4 + Recharts
 - `src/lib/types.ts` — input/result types. `src/lib/defaults.ts` — Dubai defaults.
 - `src/lib/validate.ts` — non-blocking UAE rule checks (20/25% down, 25-yr tenure).
 - `src/lib/presets.ts` — Dubai / Abu Dhabi statutory fee presets.
-- `src/components/` — `InputPanel`, `NumberField` (slider + number pair), `ResultsSummary`, `CostChart`.
-- `src/app/page.tsx` — client page wiring state → `calculate()` → UI.
+- `src/lib/verdict.ts` — headline copy from a result. `src/lib/urlState.ts` — query-string codec.
+- `src/components/` — `Calculator` (state owner), `InputPanel` + `NumberField`, `VerdictCard`,
+  `ResultsSummary`, `CostChart`, `YearTable`, `Methodology`, `ShareButton`.
+- `src/app/page.tsx` — server shell (header + `<Suspense>`); `Calculator` is the client boundary.
 - `src/lib/*.test.ts` — Vitest suites. `npm test` (or `npm run test:watch`).
 
 ## Model
@@ -45,5 +47,17 @@ Rules are advisory, never blocking — `validate()` returns `Warning[]` which `I
 renders inline under the relevant field. `warn` level is a UAE rule break (min down
 payment, 25-yr tenure cap, impossible figures); `info` level is a soft caution.
 
-## Next steps (TODOs in code)
-- Breakeven ReferenceLine on chart, year-by-year table, shareable URL state
+## Shareable state
+`Calculator` seeds its state from `useSearchParams()` on first render (hence the `<Suspense>`
+boundary in `page.tsx` — required with Cache Components), then keeps the URL in sync with
+`window.history.replaceState`. Only inputs that differ from `DEFAULT_INPUTS` are written, so a
+default link stays clean. Decoding ignores junk rather than producing `NaN`.
+
+## Theming
+Chart and surface colours are CSS variables in `globals.css`, switched by
+`prefers-color-scheme`. Recharts SVG props take `var(--chart-*)` directly; the tooltip is a
+custom component with Tailwind `dark:` classes.
+
+## Next steps
+- Rental yield / letting the property, mortgage life insurance, fit-out costs
+- Scenario comparison (save two sets of inputs side by side)
