@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Public_Sans } from "next/font/google";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 // Fraunces carries the judgement calls — the verdict and the page title.
@@ -18,15 +21,33 @@ const text = Public_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Rent or buy in the UAE",
+  title: "BREAKEVEN UAE | Rent vs Buy Property Calculator | دار الميزان",
   description:
-    "Compare renting against buying a UAE home on true net cost: transfer and agent fees, service charges, exit costs and the return you give up on the cash you tie up.",
+    "Compare renting against buying a UAE residential home on true net cost: DLD/ADREC statutory transfer fees, mortgage registration, service charges, early settlement rules, and investment opportunity costs.",
+  icons: {
+    icon: "/logo.svg",
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${display.variable} ${text.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+      </head>
+      <body className="flex min-h-full flex-col bg-paper text-ink selection:bg-buy/15">
+        <LanguageProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </div>
+        </LanguageProvider>
+      </body>
     </html>
   );
 }
