@@ -14,6 +14,7 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
       { key: "tenureYears", label: "Tenure", suffix: "yrs", step: 1 },
       { key: "propertySizeSqft", label: "Size", suffix: "sqft", step: 50 },
       { key: "serviceChargePerSqft", label: "Service charge", suffix: "AED/sqft", step: 1 },
+      { key: "serviceChargeIncreasePct", label: "Service charge rise", suffix: "%/yr", step: 0.5 },
       { key: "maintenancePct", label: "Maintenance", suffix: "%/yr", step: 0.1 },
       { key: "appreciationPct", label: "Appreciation", suffix: "%/yr", step: 0.5 },
     ],
@@ -28,10 +29,19 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
     ],
   },
   {
+    title: "Selling costs",
+    fields: [
+      { key: "sellingAgentFeePct", label: "Agent fee on sale", suffix: "% + VAT", step: 0.5 },
+    ],
+  },
+  {
     title: "Renting",
     fields: [
       { key: "annualRent", label: "Annual rent", suffix: "AED", step: 5_000 },
       { key: "rentIncreasePct", label: "Rent increase", suffix: "%/yr", step: 0.5 },
+      { key: "dewaHousingFeePct", label: "DEWA housing fee", suffix: "% of rent", step: 0.5 },
+      { key: "ejariFeeAnnual", label: "Ejari registration", suffix: "AED/yr", step: 10 },
+      { key: "securityDepositPct", label: "Security deposit", suffix: "% of rent", step: 1 },
       { key: "investmentReturnPct", label: "Investment return", suffix: "%/yr", step: 0.5 },
     ],
   },

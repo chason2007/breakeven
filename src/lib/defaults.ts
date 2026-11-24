@@ -8,6 +8,7 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   tenureYears: 25,
   serviceChargePerSqft: 18,
   propertySizeSqft: 1_200,
+  serviceChargeIncreasePct: 3,
   maintenancePct: 0.5,
   appreciationPct: 3,
 
@@ -16,8 +17,13 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   agentFeePct: 2,
   otherUpfront: 10_000,
 
+  sellingAgentFeePct: 2,
+
   annualRent: 130_000,
   rentIncreasePct: 5,
+  dewaHousingFeePct: 5,
+  ejariFeeAnnual: 220,
+  securityDepositPct: 5,
   investmentReturnPct: 5,
 
   horizonYears: 10,
