@@ -1,5 +1,11 @@
 import type { CalculatorInputs, CalculatorResult, YearRow } from "./types";
 
+/** Flat DLD mortgage registration admin fee (AED), independent of loan size. */
+export const DLD_MORTGAGE_ADMIN_FEE = 290;
+
+/** VAT applied to broker/agent services in the UAE. */
+export const VAT_RATE = 0.05;
+
 /** Standard amortizing monthly payment. */
 export function monthlyPayment(principal: number, annualRatePct: number, years: number): number {
   const n = years * 12;
@@ -32,8 +38,8 @@ export function calculate(i: CalculatorInputs): CalculatorResult {
   const upfrontCosts =
     (i.propertyPrice * i.dldFeePct) / 100 +
     (loanAmount * i.mortgageRegistrationPct) / 100 +
-    290 + // DLD mortgage registration admin fee
-    ((i.propertyPrice * i.agentFeePct) / 100) * 1.05 + // agent fee + 5% VAT
+    DLD_MORTGAGE_ADMIN_FEE +
+    ((i.propertyPrice * i.agentFeePct) / 100) * (1 + VAT_RATE) + // agent fee + VAT
     i.otherUpfront;
 
   const serviceCharge = i.serviceChargePerSqft * i.propertySizeSqft;
