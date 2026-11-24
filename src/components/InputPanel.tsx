@@ -1,7 +1,7 @@
 "use client";
 
 import { NumberField } from "@/components/NumberField";
-import { EMIRATE_PRESETS, type EmirateId, applyPreset, detectEmirate } from "@/lib/presets";
+import { EMIRATE_PRESETS, applyPreset, detectEmirate } from "@/lib/presets";
 import type { CalculatorInputs } from "@/lib/types";
 import type { Warning } from "@/lib/validate";
 
@@ -98,7 +98,7 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
     ],
   },
   {
-    title: "Buying fees",
+    title: "Fees to buy",
     fields: [
       {
         key: "dldFeePct",
@@ -130,7 +130,7 @@ const SECTIONS: { title: string; fields: Field[] }[] = [
     ],
   },
   {
-    title: "Selling fees",
+    title: "Fees to sell",
     fields: [
       {
         key: "sellingAgentFeePct",
@@ -215,22 +215,19 @@ interface Props {
 
 export function InputPanel({ value, warnings, onChange }: Props) {
   const activeEmirate = detectEmirate(value);
+  const activeNote = EMIRATE_PRESETS.find((p) => p.id === activeEmirate)?.note;
 
   const set = (key: keyof CalculatorInputs) => (next: number) =>
     onChange({ ...value, [key]: next });
 
-  const choosePreset = (id: EmirateId) => onChange(applyPreset(value, id));
-
   return (
-    <form className="space-y-7" onSubmit={(e) => e.preventDefault()}>
+    <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
       <fieldset>
-        <legend className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-          Emirate
-        </legend>
+        <legend className="sr-only">Emirate</legend>
         <div
           role="group"
-          aria-label="Emirate preset"
-          className="flex rounded-xl border border-slate-300 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/60"
+          aria-label="Emirate"
+          className="flex gap-1 rounded-lg border border-rule p-1"
         >
           {EMIRATE_PRESETS.map((preset) => {
             const active = activeEmirate === preset.id;
@@ -238,12 +235,12 @@ export function InputPanel({ value, warnings, onChange }: Props) {
               <button
                 key={preset.id}
                 type="button"
-                onClick={() => choosePreset(preset.id)}
+                onClick={() => onChange(applyPreset(value, preset.id))}
                 aria-pressed={active}
-                className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 ${
+                className={`flex-1 rounded-md px-3 py-1.5 text-[0.8125rem] font-semibold transition-colors ${
                   active
-                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white"
-                    : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                    ? "bg-buy text-white"
+                    : "text-ink-soft hover:bg-rule-soft hover:text-ink"
                 }`}
               >
                 {preset.label}
@@ -251,19 +248,17 @@ export function InputPanel({ value, warnings, onChange }: Props) {
             );
           })}
         </div>
-        <p className="mt-2 text-xs leading-snug text-slate-500 dark:text-slate-400">
-          {activeEmirate
-            ? EMIRATE_PRESETS.find((p) => p.id === activeEmirate)!.note
-            : "Custom fees — pick an emirate to reset the statutory rates."}
+        <p className="mt-2 text-[0.6875rem] leading-snug text-ink-faint">
+          {activeNote ?? "Fees edited by hand. Pick an emirate to restore the statutory rates."}
         </p>
       </fieldset>
 
       {SECTIONS.map((section) => (
         <fieldset key={section.title}>
-          <legend className="mb-1 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+          <legend className="w-full border-b border-rule pb-1.5 text-[0.8125rem] font-semibold">
             {section.title}
           </legend>
-          <div className="divide-y divide-slate-200/70 dark:divide-slate-800">
+          <div className="divide-y divide-rule-soft">
             {section.fields.map((f) => (
               <NumberField
                 key={f.key}

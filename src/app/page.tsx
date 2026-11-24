@@ -3,38 +3,35 @@ import { Calculator } from "@/components/Calculator";
 
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
-      <header className="mb-8 max-w-2xl">
-        <p className="text-xs font-semibold uppercase tracking-widest text-sky-700 dark:text-sky-400">
-          UAE property
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Rent vs Buy</h1>
-        <p className="mt-3 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-          The true cost of owning a home in the UAE, with the fees people forget — land
-          department transfer, service charges, exit costs — and the return you give up on the
-          cash you tie up.
+    <main className="mx-auto w-full max-w-[82rem] px-5 py-10 sm:px-8 sm:py-14">
+      <header className="max-w-[34rem]">
+        <h1 className="font-display text-[2.125rem] leading-[1.05] font-semibold sm:text-5xl">
+          Rent or buy in the UAE?
+        </h1>
+        <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink-soft">
+          Owning costs more than the mortgage. This compares both sides on net cost — transfer
+          and agent fees, service charges, what it takes to sell again, and the return you give
+          up on the cash you tie up.
         </p>
       </header>
 
       {/* useSearchParams needs a Suspense boundary so the rest of the page can prerender. */}
-      <Suspense fallback={<CalculatorSkeleton />}>
-        <Calculator />
-      </Suspense>
+      <div className="mt-10 sm:mt-12">
+        <Suspense fallback={<CalculatorSkeleton />}>
+          <Calculator />
+        </Suspense>
+      </div>
     </main>
   );
 }
 
 function CalculatorSkeleton() {
   return (
-    <div
-      aria-hidden
-      className="grid items-start gap-6 lg:grid-cols-[21rem_minmax(0,1fr)] lg:gap-8"
-    >
-      <div className="h-[32rem] animate-pulse rounded-2xl border border-slate-200 bg-surface dark:border-slate-800" />
-      <div className="space-y-6">
-        <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-surface dark:border-slate-800" />
-        <div className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-surface dark:border-slate-800" />
-        <div className="h-96 animate-pulse rounded-2xl border border-slate-200 bg-surface dark:border-slate-800" />
+    <div aria-hidden className="grid gap-10 lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-14">
+      <div className="h-[30rem] animate-pulse rounded-md bg-rule-soft" />
+      <div className="space-y-8">
+        <div className="h-[34rem] animate-pulse rounded-2xl bg-rule-soft" />
+        <div className="h-14 animate-pulse rounded-md bg-rule-soft" />
       </div>
     </div>
   );

@@ -10,8 +10,9 @@ Portfolio project: Next.js 16 (App Router) + TypeScript + Tailwind v4 + Recharts
 - `src/lib/validate.ts` — non-blocking UAE rule checks (20/25% down, 25-yr tenure).
 - `src/lib/presets.ts` — Dubai / Abu Dhabi statutory fee presets.
 - `src/lib/verdict.ts` — headline copy from a result. `src/lib/urlState.ts` — query-string codec.
-- `src/components/` — `Calculator` (state owner), `InputPanel` + `NumberField`, `VerdictCard`,
-  `ResultsSummary`, `CostChart`, `YearTable`, `Methodology`, `ShareButton`.
+- `src/components/` — `Calculator` (state owner), `InputPanel` + `NumberField`,
+  `DecisionPanel` (verdict + chart + key figures, one object), `CostChart`, `YearTable`,
+  `Methodology`, `ShareButton`.
 - `src/app/page.tsx` — server shell (header + `<Suspense>`); `Calculator` is the client boundary.
 - `src/lib/*.test.ts` — Vitest suites. `npm test` (or `npm run test:watch`).
 
@@ -53,10 +54,24 @@ boundary in `page.tsx` — required with Cache Components), then keeps the URL i
 `window.history.replaceState`. Only inputs that differ from `DEFAULT_INPUTS` are written, so a
 default link stays clean. Decoding ignores junk rather than producing `NaN`.
 
-## Theming
-Chart and surface colours are CSS variables in `globals.css`, switched by
-`prefers-color-scheme`. Recharts SVG props take `var(--chart-*)` directly; the tooltip is a
-custom component with Tailwind `dark:` classes.
+## Design
+Fraunces (display) for the verdict and page title; Public Sans for everything else. Chroma is
+spent only on the two data colours — `--buy` and `--rent` — so colour always carries meaning.
+All tokens are CSS variables in `globals.css`, redefined under `prefers-color-scheme: dark`
+and exposed to Tailwind via `@theme inline`, so components use `text-buy` / `bg-panel` with no
+`dark:` variants. Recharts SVG props take `var(--buy)` etc. directly.
+
+Every foreground/background pair clears WCAG AA (lightest is `--ink-faint` at 5.0:1 light,
+5.4:1 dark). Verified in-browser at 375px and 1440px.
+
+Layout: the verdict and the chart that proves it share one frame. Everything below is ruled
+rather than carded. `DecisionPanel` comes first in the DOM so phones and screen readers get
+the answer before the inputs; `lg:col-start-*` puts the controls back in the left rail on
+large screens without reordering markup.
+
+In `NumberField` the number input is the accessible control and the slider is
+`aria-hidden` + `tabIndex={-1}` — a pointer affordance, so 21 fields don't become 42 tab
+stops. The slider thumb clamps to its range while the number input still accepts anything.
 
 ## Next steps
 - Rental yield / letting the property, mortgage life insurance, fit-out costs

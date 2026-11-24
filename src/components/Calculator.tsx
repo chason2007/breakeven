@@ -2,12 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { CostChart } from "@/components/CostChart";
+import { DecisionPanel } from "@/components/DecisionPanel";
 import { InputPanel } from "@/components/InputPanel";
 import { Methodology } from "@/components/Methodology";
-import { ResultsSummary } from "@/components/ResultsSummary";
-import { ShareButton } from "@/components/ShareButton";
-import { VerdictCard } from "@/components/VerdictCard";
 import { YearTable } from "@/components/YearTable";
 import { calculate } from "@/lib/calc";
 import { DEFAULT_INPUTS } from "@/lib/defaults";
@@ -25,54 +22,43 @@ export function Calculator() {
   const warnings = useMemo(() => validate(inputs), [inputs]);
   const query = useMemo(() => encodeInputs(inputs), [inputs]);
 
-  // Keep the URL shareable without pushing history entries for every keystroke.
+  // Keep the URL shareable without pushing a history entry per keystroke.
   useEffect(() => {
-    const next = query ? `?${query}` : window.location.pathname;
-    if (window.location.search.replace(/^\?/, "") !== query) {
-      window.history.replaceState(null, "", next);
-    }
+    if (window.location.search.replace(/^\?/, "") === query) return;
+    window.history.replaceState(null, "", query ? `?${query}` : window.location.pathname);
   }, [query]);
 
-  const reset = () => setInputs(DEFAULT_INPUTS);
   const isDefault = query === "";
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[21rem_minmax(0,1fr)] lg:gap-8">
-      <aside className="rounded-2xl border border-slate-200 bg-surface p-5 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto dark:border-slate-800">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <h2 className="font-semibold">Your numbers</h2>
+    <div className="grid items-start gap-10 lg:grid-cols-[19rem_minmax(0,1fr)] lg:gap-14">
+      {/*
+        The verdict comes first in the DOM so a phone (and a screen reader) gets
+        the answer before 21 inputs. On large screens grid placement moves the
+        controls back to the left rail without reordering the markup.
+      */}
+      <div className="space-y-10 lg:col-start-2 lg:row-start-1">
+        <DecisionPanel result={result} horizonYears={inputs.horizonYears} />
+        <div>
+          <YearTable years={result.years} breakevenYear={result.breakevenYear} />
+          <Methodology />
+        </div>
+      </div>
+
+      <aside className="lg:col-start-1 lg:row-start-1 lg:sticky lg:top-8 lg:max-h-[calc(100dvh-4rem)] lg:overflow-y-auto lg:pr-4">
+        <div className="mb-5 flex items-baseline justify-between gap-3 border-b border-rule pb-2">
+          <h2 className="text-sm font-semibold">Your numbers</h2>
           <button
             type="button"
-            onClick={reset}
+            onClick={() => setInputs(DEFAULT_INPUTS)}
             disabled={isDefault}
-            className="rounded-md px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 disabled:opacity-40 disabled:hover:text-slate-500 dark:text-slate-400 dark:hover:text-white dark:disabled:hover:text-slate-400"
+            className="text-xs font-medium text-ink-faint transition-colors hover:text-ink disabled:opacity-40 disabled:hover:text-ink-faint"
           >
             Reset
           </button>
         </div>
         <InputPanel value={inputs} warnings={warnings} onChange={setInputs} />
       </aside>
-
-      <div className="space-y-6">
-        <VerdictCard result={result} horizonYears={inputs.horizonYears} />
-        <ResultsSummary result={result} horizonYears={inputs.horizonYears} />
-
-        <section className="rounded-2xl border border-slate-200 bg-surface p-5 sm:p-6 dark:border-slate-800">
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="font-semibold">Cumulative net cost</h2>
-              <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-                Cash spent minus what you walk away with, if you exit in that year.
-              </p>
-            </div>
-            <ShareButton />
-          </div>
-          <CostChart data={result.years} breakevenYear={result.breakevenYear} />
-        </section>
-
-        <YearTable years={result.years} breakevenYear={result.breakevenYear} />
-        <Methodology />
-      </div>
     </div>
   );
 }

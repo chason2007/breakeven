@@ -1,53 +1,142 @@
 @import "tailwindcss";
 
+/*
+  Cool near-white paper with inky text. Chroma is spent only on the two data
+  colours (buy / rent) so colour always means something here — it is never
+  decoration. Blue against sienna is the colour-blind-safe pair for two series.
+*/
 :root {
-  --background: #f8fafc;
-  --surface: #ffffff;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
+  --paper: #fbfbfd;
+  --panel: #ffffff;
+  --ink: #0f1419;
+  --ink-soft: #46505f;
+  --ink-faint: #646e7c;
+  --rule: #e2e5eb;
+  --rule-soft: #eef0f4;
 
-  /* Blue vs. amber: the standard colour-blind-safe pair for two series. */
-  --chart-buy: #0369a1;
-  --chart-rent: #b45309;
-  --chart-grid: #cbd5e1;
-  --chart-axis: #64748b;
-  --chart-breakeven: #475569;
+  --buy: #1b4d8f;
+  --buy-wash: #eef3fb;
+  --rent: #a3451c;
+  --rent-wash: #fbf2ec;
+  --flag: #8a5a00;
+
+  --grid: #e2e5eb;
+  --axis: #6b7686;
+  --mark: #46505f;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #020618;
-    --surface: #0f172a;
-    --foreground: #e2e8f0;
-    --muted: #94a3b8;
-    --border: #1e2939;
+    --paper: #0c1017;
+    --panel: #141a24;
+    --ink: #e8ecf2;
+    --ink-soft: #a8b2c1;
+    --ink-faint: #8290a1;
+    --rule: #242c38;
+    --rule-soft: #1b2230;
 
-    --chart-buy: #38bdf8;
-    --chart-rent: #fbbf24;
-    --chart-grid: #1e2939;
-    --chart-axis: #94a3b8;
-    --chart-breakeven: #94a3b8;
+    --buy: #7fb3f5;
+    --buy-wash: #14243a;
+    --rent: #e79b6b;
+    --rent-wash: #2d1d14;
+    --flag: #e3b341;
+
+    --grid: #242c38;
+    --axis: #8290a1;
+    --mark: #a8b2c1;
   }
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-buy: var(--buy);
+  --color-buy-wash: var(--buy-wash);
+  --color-rent: var(--rent);
+  --color-rent-wash: var(--rent-wash);
+  --color-flag: var(--flag);
+
+  --font-display: var(--font-display), Georgia, serif;
+  --font-text: var(--font-text), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text), system-ui, sans-serif;
+  font-feature-settings: "tnum" 0;
 }
 
-/* Recharts renders its tooltip as a focusable wrapper; suppress the outline. */
+/* Fraunces reads best for display at a low optical size with a touch of wonk. */
+.font-display {
+  font-variation-settings:
+    "SOFT" 20,
+    "WONK" 1,
+    "opsz" 48;
+  letter-spacing: -0.02em;
+}
+
+/* One consistent focus treatment across inputs, buttons and summaries. */
+:where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--buy);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/*
+  Sliders are drawn by hand: the track is a gradient set inline (so it fills to
+  the current value) which means the thumb has to be styled explicitly too.
+*/
+input[type="range"] {
+  accent-color: var(--buy);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--buy);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+  cursor: grab;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--buy);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+  cursor: grab;
+}
+
+/* Firefox paints its own track over the inline gradient. */
+input[type="range"]::-moz-range-track {
+  background: transparent;
+}
+
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

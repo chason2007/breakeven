@@ -1,29 +1,32 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Fraunces carries the judgement calls — the verdict and the page title.
+const display = Fraunces({
+  variable: "--font-display",
   subsets: ["latin"],
+  axes: ["SOFT", "WONK", "opsz"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Public Sans carries the regulated numbers: plainspoken, strong tabular figures.
+const text = Public_Sans({
+  variable: "--font-text",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "UAE Rent vs Buy Calculator",
-  description: "Compare renting vs buying a home in the UAE: monthly cost, breakeven year and total cost.",
+  title: "Rent or buy in the UAE",
+  description:
+    "Compare renting against buying a UAE home on true net cost: transfer and agent fees, service charges, exit costs and the return you give up on the cash you tie up.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${display.variable} ${text.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

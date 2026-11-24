@@ -28,19 +28,21 @@ export function NumberField({
   warnings = [],
 }: NumberFieldProps) {
   const id = useId();
-  const describedBy = warnings.length ? `${id}-warnings` : hint ? `${id}-hint` : undefined;
-  const hasError = warnings.some((w) => w.level === "warn");
-  // The slider cannot represent out-of-range values; clamp its thumb and let the
-  // number input carry the real figure so nothing is silently rewritten.
-  const sliderValue = Math.min(Math.max(value, min), max);
+  const messages = warnings.length ? `${id}-messages` : undefined;
+  const described = [messages, hint ? `${id}-hint` : undefined].filter(Boolean).join(" ");
+  const flagged = warnings.some((w) => w.level === "warn");
+  // The slider can't represent out-of-range values, so clamp the thumb and let
+  // the number input carry the real figure — nothing typed is rewritten.
+  const thumb = Math.min(Math.max(value, min), max);
+  const progress = ((thumb - min) / (max - min)) * 100;
 
   return (
-    <div className="py-2.5">
+    <div className="py-3">
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm text-slate-700 dark:text-slate-300">
+        <label htmlFor={id} className="text-[0.8125rem] leading-snug text-ink-soft">
           {label}
         </label>
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-baseline gap-1.5">
           <input
             id={id}
             type="number"
@@ -48,52 +50,57 @@ export function NumberField({
             step={step}
             value={Number.isFinite(value) ? value : ""}
             onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
-            aria-invalid={hasError || undefined}
-            aria-describedby={describedBy}
-            className={`w-28 rounded-lg border bg-white px-2.5 py-1.5 text-right text-sm font-medium tabular-nums text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/40 dark:bg-slate-900 dark:text-slate-100 ${
-              hasError
-                ? "border-amber-500 dark:border-amber-500/70"
-                : "border-slate-300 focus:border-sky-500 dark:border-slate-700 dark:focus:border-sky-400"
+            aria-invalid={flagged || undefined}
+            aria-describedby={described || undefined}
+            className={`w-[5.5rem] rounded-sm border-b bg-transparent py-0.5 text-right text-sm font-semibold tabular-nums transition-colors focus:outline-none ${
+              flagged
+                ? "border-flag text-flag"
+                : "border-rule hover:border-ink-faint focus:border-buy"
             }`}
           />
           {suffix ? (
-            <span className="w-[4.5rem] shrink-0 text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-[3.75rem] text-[0.6875rem] leading-tight text-ink-faint">
               {suffix}
             </span>
           ) : null}
         </div>
       </div>
 
+      {/*
+        A pointer-only affordance: the number input above is the accessible,
+        keyboard-reachable control, so this is hidden from assistive tech rather
+        than duplicating every field as a second tab stop.
+      */}
       <input
+        aria-hidden
+        tabIndex={-1}
         type="range"
         min={min}
         max={max}
         step={step}
-        value={sliderValue}
+        value={thumb}
         onChange={(e) => onChange(Number(e.target.value))}
-        aria-label={`${label} slider`}
-        tabIndex={-1}
-        className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-sky-600 dark:bg-slate-700 dark:accent-sky-400"
+        style={{
+          background: `linear-gradient(to right, var(--buy) ${progress}%, var(--rule) ${progress}%)`,
+        }}
+        className="mt-2.5 h-[3px] w-full cursor-pointer appearance-none rounded-full"
       />
 
       {warnings.length ? (
-        <ul id={`${id}-warnings`} className="mt-1.5 space-y-1">
+        <ul id={messages} className="mt-2 space-y-1">
           {warnings.map((w) => (
             <li
               key={w.message}
-              className={`text-xs leading-snug ${
-                w.level === "warn"
-                  ? "text-amber-700 dark:text-amber-400"
-                  : "text-slate-500 dark:text-slate-400"
+              className={`text-[0.6875rem] leading-snug ${
+                w.level === "warn" ? "text-flag" : "text-ink-faint"
               }`}
             >
-              {w.level === "warn" ? "⚠ " : ""}
               {w.message}
             </li>
           ))}
         </ul>
       ) : hint ? (
-        <p id={`${id}-hint`} className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <p id={`${id}-hint`} className="mt-2 text-[0.6875rem] leading-snug text-ink-faint">
           {hint}
         </p>
       ) : null}
