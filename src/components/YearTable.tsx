@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/context/LanguageContext";
 import { formatNumber } from "@/lib/format";
 import type { YearRow } from "@/lib/types";
 
@@ -8,75 +9,114 @@ interface Props {
   breakevenYear: number | null;
 }
 
-const COLUMNS: { key: keyof YearRow; label: string; title: string; tone?: "buy" | "rent" }[] = [
-  { key: "mortgagePaid", label: "Mortgage", title: "Mortgage payments made this year" },
-  { key: "serviceCharge", label: "Service", title: "Service charge for the year" },
-  { key: "maintenance", label: "Upkeep", title: "Maintenance for the year" },
-  { key: "loanBalance", label: "Loan left", title: "Outstanding mortgage balance" },
-  { key: "homeValue", label: "Home value", title: "Property value after appreciation" },
-  { key: "sellingCosts", label: "To sell", title: "Agent fee plus VAT and early settlement" },
-  {
-    key: "buyNetCost",
-    label: "Buying",
-    title: "Cumulative net cost of buying",
-    tone: "buy",
-  },
-  { key: "rentCashOut", label: "Rent paid", title: "Rent plus housing fee and Ejari" },
-  {
-    key: "rentNetCost",
-    label: "Renting",
-    title: "Cumulative net cost of renting",
-    tone: "rent",
-  },
-];
-
 export function YearTable({ years, breakevenYear }: Props) {
+  const { lang, t, isArabic } = useLanguage();
+
+  const columns: {
+    key: keyof YearRow;
+    label: string;
+    title: string;
+    tone?: "buy" | "rent";
+  }[] = [
+    {
+      key: "mortgagePaid",
+      label: t.tableColumns.mortgagePaid.label,
+      title: t.tableColumns.mortgagePaid.title,
+    },
+    {
+      key: "serviceCharge",
+      label: t.tableColumns.serviceCharge.label,
+      title: t.tableColumns.serviceCharge.title,
+    },
+    {
+      key: "maintenance",
+      label: t.tableColumns.maintenance.label,
+      title: t.tableColumns.maintenance.title,
+    },
+    {
+      key: "loanBalance",
+      label: t.tableColumns.loanBalance.label,
+      title: t.tableColumns.loanBalance.title,
+    },
+    {
+      key: "homeValue",
+      label: t.tableColumns.homeValue.label,
+      title: t.tableColumns.homeValue.title,
+    },
+    {
+      key: "sellingCosts",
+      label: t.tableColumns.sellingCosts.label,
+      title: t.tableColumns.sellingCosts.title,
+    },
+    {
+      key: "buyNetCost",
+      label: t.tableColumns.buyNetCost.label,
+      title: t.tableColumns.buyNetCost.title,
+      tone: "buy",
+    },
+    {
+      key: "rentCashOut",
+      label: t.tableColumns.rentCashOut.label,
+      title: t.tableColumns.rentCashOut.title,
+    },
+    {
+      key: "rentNetCost",
+      label: t.tableColumns.rentNetCost.label,
+      title: t.tableColumns.rentNetCost.title,
+      tone: "rent",
+    },
+  ];
+
   return (
-    <details className="group border-t border-rule">
-      <summary className="flex cursor-pointer list-none items-center gap-2.5 py-4 text-sm font-semibold">
-        <svg
-          aria-hidden
-          viewBox="0 0 16 16"
-          className="h-3.5 w-3.5 shrink-0 text-ink-faint transition-transform group-open:rotate-90"
-        >
-          <path
-            d="M6 3.5 10.5 8 6 12.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        Year by year
-        <span className="font-normal text-ink-faint">
-          {years.length} {years.length === 1 ? "year" : "years"}, in AED
+    <details className="group rounded-xl border border-rule bg-panel overflow-hidden shadow-2xs transition-all">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold transition-colors hover:bg-rule-soft/40">
+        <div className="flex items-center gap-2.5">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className={`h-4 w-4 shrink-0 text-ink-faint transition-transform ${
+              isArabic ? "group-open:-rotate-90" : "group-open:rotate-90"
+            }`}
+          >
+            <path
+              d={isArabic ? "M10 3.5 5.5 8 10 12.5" : "M6 3.5 10.5 8 6 12.5"}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="font-bold text-ink">{t.yearByYear}</span>
+        </div>
+        <span className="text-xs font-normal text-ink-faint">
+          {years.length} {t.yearsInAed}
         </span>
       </summary>
 
-      <div className="-mx-5 overflow-x-auto pb-5 sm:mx-0">
-        <table className="w-full min-w-[44rem] border-collapse text-right text-[0.8125rem]">
+      <div className="border-t border-rule overflow-x-auto pb-4">
+        <table className="w-full min-w-[50rem] border-collapse text-end text-[0.8125rem]">
           <caption className="sr-only">
-            Annual cash flows and cumulative net cost for buying and renting
+            {t.yearByYear}
           </caption>
           <thead>
-            <tr className="border-b border-rule">
+            <tr className="border-b border-rule bg-rule-soft/40">
               <th
                 scope="col"
-                className="sticky left-0 bg-paper px-5 py-2 text-left font-medium text-ink-faint sm:px-3"
+                className="sticky inset-s-0 bg-panel px-4 py-2.5 text-start font-bold text-ink-faint z-10"
               >
-                Year
+                {t.yearLabel}
               </th>
-              {COLUMNS.map((c) => (
+              {columns.map((c) => (
                 <th
                   key={c.key}
                   scope="col"
                   title={c.title}
-                  className={`px-3 py-2 font-medium whitespace-nowrap ${
+                  className={`px-3 py-2.5 font-bold whitespace-nowrap ${
                     c.tone === "buy"
-                      ? "text-buy"
+                      ? "text-buy bg-buy-wash/40"
                       : c.tone === "rent"
-                        ? "text-rent"
+                        ? "text-rent bg-rent-wash/40"
                         : "text-ink-faint"
                   }`}
                 >
@@ -91,25 +131,27 @@ export function YearTable({ years, breakevenYear }: Props) {
               return (
                 <tr
                   key={row.year}
-                  className={`border-b border-rule-soft last:border-0 ${
-                    marked ? "bg-buy-wash" : ""
+                  className={`border-b border-rule-soft transition-colors hover:bg-rule-soft/30 ${
+                    marked ? "bg-gold-wash/80 font-medium" : ""
                   }`}
                 >
                   <th
                     scope="row"
-                    className={`sticky left-0 px-5 py-1.5 text-left font-semibold whitespace-nowrap sm:px-3 ${
-                      marked ? "bg-buy-wash" : "bg-paper"
+                    className={`sticky inset-s-0 px-4 py-2 text-start font-bold whitespace-nowrap z-10 ${
+                      marked ? "bg-gold-wash text-gold-dark" : "bg-panel text-ink"
                     }`}
                   >
                     {row.year}
                     {marked ? (
-                      <span className="ml-2 font-normal text-ink-faint">breakeven</span>
+                      <span className="ms-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gold text-white uppercase tracking-wider">
+                        {t.breakeven}
+                      </span>
                     ) : null}
                   </th>
-                  {COLUMNS.map((c) => (
+                  {columns.map((c) => (
                     <td
                       key={c.key}
-                      className={`px-3 py-1.5 tabular-nums whitespace-nowrap ${
+                      className={`px-3 py-2 tabular-nums whitespace-nowrap ${
                         c.tone === "buy"
                           ? "font-semibold text-buy"
                           : c.tone === "rent"
@@ -117,7 +159,7 @@ export function YearTable({ years, breakevenYear }: Props) {
                             : "text-ink-soft"
                       }`}
                     >
-                      {formatNumber(row[c.key])}
+                      {formatNumber(row[c.key], lang)}
                     </td>
                   ))}
                 </tr>

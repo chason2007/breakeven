@@ -31,18 +31,19 @@ export function NumberField({
   const messages = warnings.length ? `${id}-messages` : undefined;
   const described = [messages, hint ? `${id}-hint` : undefined].filter(Boolean).join(" ");
   const flagged = warnings.some((w) => w.level === "warn");
+
   // The slider can't represent out-of-range values, so clamp the thumb and let
   // the number input carry the real figure — nothing typed is rewritten.
   const thumb = Math.min(Math.max(value, min), max);
   const progress = ((thumb - min) / (max - min)) * 100;
 
   return (
-    <div className="py-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-[0.8125rem] leading-snug text-ink-soft">
+    <div className="group py-3.5 transition-colors">
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor={id} className="text-[0.8125rem] leading-snug font-medium text-ink-soft group-hover:text-ink transition-colors">
           {label}
         </label>
-        <div className="flex shrink-0 items-baseline gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           <input
             id={id}
             type="number"
@@ -52,14 +53,14 @@ export function NumberField({
             onChange={(e) => onChange(e.target.value === "" ? 0 : Number(e.target.value))}
             aria-invalid={flagged || undefined}
             aria-describedby={described || undefined}
-            className={`w-[5.5rem] rounded-sm border-b bg-transparent py-0.5 text-right text-sm font-semibold tabular-nums transition-colors focus:outline-none ${
+            className={`w-[6rem] rounded-md border bg-panel px-2 py-1 text-end text-sm font-semibold tabular-nums shadow-2xs transition-all focus:outline-none ${
               flagged
-                ? "border-flag text-flag"
-                : "border-rule hover:border-ink-faint focus:border-buy"
+                ? "border-flag bg-flag/5 text-flag focus:ring-1 focus:ring-flag"
+                : "border-rule hover:border-ink-faint focus:border-buy focus:ring-1 focus:ring-buy"
             }`}
           />
           {suffix ? (
-            <span className="w-[3.75rem] text-[0.6875rem] leading-tight text-ink-faint">
+            <span className="w-[3.75rem] text-[0.6875rem] leading-tight text-ink-faint text-start font-medium select-none">
               {suffix}
             </span>
           ) : null}
@@ -67,12 +68,11 @@ export function NumberField({
       </div>
 
       {/*
-        A pointer-only affordance: the number input above is the accessible,
-        keyboard-reachable control, so this is hidden from assistive tech rather
-        than duplicating every field as a second tab stop.
+        Pointer-only affordance: the number input above is the accessible,
+        keyboard-reachable control, so this is hidden from assistive tech.
       */}
       <input
-        aria-hidden
+        aria-hidden="true"
         tabIndex={-1}
         type="range"
         min={min}
@@ -83,7 +83,7 @@ export function NumberField({
         style={{
           background: `linear-gradient(to right, var(--buy) ${progress}%, var(--rule) ${progress}%)`,
         }}
-        className="mt-2.5 h-[3px] w-full cursor-pointer appearance-none rounded-full"
+        className="mt-2.5 h-[4px] w-full cursor-pointer appearance-none rounded-full transition-opacity opacity-85 hover:opacity-100"
       />
 
       {warnings.length ? (
@@ -91,16 +91,17 @@ export function NumberField({
           {warnings.map((w) => (
             <li
               key={w.message}
-              className={`text-[0.6875rem] leading-snug ${
-                w.level === "warn" ? "text-flag" : "text-ink-faint"
+              className={`flex items-start gap-1.5 text-[0.6875rem] leading-snug ${
+                w.level === "warn" ? "text-flag font-medium" : "text-ink-faint"
               }`}
             >
-              {w.message}
+              <span className="shrink-0 mt-0.5">•</span>
+              <span>{w.message}</span>
             </li>
           ))}
         </ul>
       ) : hint ? (
-        <p id={`${id}-hint`} className="mt-2 text-[0.6875rem] leading-snug text-ink-faint">
+        <p id={`${id}-hint`} className="mt-1.5 text-[0.6875rem] leading-snug text-ink-faint">
           {hint}
         </p>
       ) : null}
