@@ -1,0 +1,29 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="uaeGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#DFBF7A" />
+      <stop offset="50%" stopColor="#C5A059" />
+      <stop offset="100%" stopColor="#8E6B23" />
+    </linearGradient>
+    <linearGradient id="uaeNavy" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#1B4D8F" />
+      <stop offset="100%" stopColor="#0B2545" />
+    </linearGradient>
+  </defs>
+  <rect x="32" y="3" width="41" height="41" rx="7" transform="rotate(45 32 3)" fill="url(#uaeNavy)" stroke="url(#uaeGold)" stroke-width="1.75" />
+  <rect x="32" y="8" width="34" height="34" rx="4" transform="rotate(45 32 8)" stroke="url(#uaeGold)" stroke-width="0.8" stroke-opacity="0.45" fill="none" />
+  <path d="M32 10L35 22H29L32 10Z" fill="url(#uaeGold)" />
+  <line x1="32" y1="8" x2="32" y2="22" stroke="#FFF" stroke-width="1" stroke-linecap="round" opacity="0.8" />
+  <path d="M26 24H38V44H26V24Z" fill="#0B2545" stroke="url(#uaeGold)" stroke-width="1.2" />
+  <line x1="26" y1="29" x2="38" y2="29" stroke="url(#uaeGold)" stroke-width="0.8" opacity="0.6" />
+  <line x1="26" y1="34" x2="38" y2="34" stroke="url(#uaeGold)" stroke-width="0.8" opacity="0.6" />
+  <line x1="26" y1="39" x2="38" y2="39" stroke="url(#uaeGold)" stroke-width="0.8" opacity="0.6" />
+  <path d="M17 38L32 25L47 38" stroke="url(#uaeGold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M29 44V36C29 34.3431 30.3431 33 32 33C33.6569 33 35 34.3431 35 36V44" stroke="url(#uaeGold)" stroke-width="1.5" fill="url(#uaeGold)" fill-opacity="0.25" />
+  <circle cx="21" cy="45" r="2.5" fill="url(#uaeGold)" />
+  <circle cx="43" cy="45" r="2.5" fill="url(#uaeGold)" />
+  <line x1="19" y1="48" x2="45" y2="48" stroke="url(#uaeGold)" stroke-width="1.75" stroke-linecap="round" />
+  <circle cx="28" cy="53" r="1.2" fill="#009739" />
+  <circle cx="32" cy="53" r="1.2" fill="#FFFFFF" />
+  <circle cx="36" cy="53" r="1.2" fill="#E5233B" />
+</svg>

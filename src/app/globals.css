@@ -1,55 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&family=Amiri:wght@700&display=swap');
 @import "tailwindcss";
 
 /*
-  Cool near-white paper with inky text. Chroma is spent only on the two data
-  colours (buy / rent) so colour always means something here — it is never
-  decoration. Blue against sienna is the colour-blind-safe pair for two series.
+  UAE Property & Wealth Branding:
+  Near-white cool paper with deep architectural navy, desert sand, and luxury gold accents.
+  The two primary data colours (buy: sapphire navy / rent: terracotta sienna) provide
+  immediate visual clarity and WCAG AA contrast.
 */
 :root {
-  --paper: #fbfbfd;
+  --paper: #f9fafb;
   --panel: #ffffff;
-  --ink: #0f1419;
-  --ink-soft: #46505f;
-  --ink-faint: #646e7c;
-  --rule: #e2e5eb;
-  --rule-soft: #eef0f4;
+  --panel-elevated: #ffffff;
+  --ink: #0b1523;
+  --ink-soft: #3e4a5b;
+  --ink-faint: #606d80;
+  --rule: #e3e7ee;
+  --rule-soft: #edf0f5;
 
-  --buy: #1b4d8f;
-  --buy-wash: #eef3fb;
-  --rent: #a3451c;
-  --rent-wash: #fbf2ec;
+  --buy: #124b91;
+  --buy-wash: #eff5fc;
+  --buy-dark: #092c57;
+  --rent: #a7461c;
+  --rent-wash: #fcf3ed;
+  --rent-dark: #6e2a0d;
   --flag: #8a5a00;
 
-  --grid: #e2e5eb;
-  --axis: #6b7686;
-  --mark: #46505f;
+  /* UAE Prestige Gold & Desert Sand Accents */
+  --gold: #b38b36;
+  --gold-dark: #8f6c20;
+  --gold-light: #d6af5d;
+  --gold-wash: #fcf7ec;
+  --uae-green: #00873a;
+  --uae-red: #d91c32;
+
+  --grid: #e2e6ed;
+  --axis: #6b7787;
+  --mark: #475363;
+
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(15 23 42 / 0.08), 0 4px 6px -4px rgb(15 23 42 / 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #0c1017;
-    --panel: #141a24;
-    --ink: #e8ecf2;
-    --ink-soft: #a8b2c1;
-    --ink-faint: #8290a1;
-    --rule: #242c38;
-    --rule-soft: #1b2230;
+    --paper: #090e17;
+    --panel: #111722;
+    --panel-elevated: #161e2c;
+    --ink: #ebf0f7;
+    --ink-soft: #a2afc2;
+    --ink-faint: #7a889b;
+    --rule: #212a38;
+    --rule-soft: #171f2b;
 
-    --buy: #7fb3f5;
-    --buy-wash: #14243a;
-    --rent: #e79b6b;
-    --rent-wash: #2d1d14;
+    --buy: #72abf2;
+    --buy-wash: #102138;
+    --buy-dark: #9bc5f7;
+    --rent: #e79766;
+    --rent-wash: #2b1b12;
+    --rent-dark: #f0b48f;
     --flag: #e3b341;
 
-    --grid: #242c38;
-    --axis: #8290a1;
-    --mark: #a8b2c1;
+    --gold: #dfbe78;
+    --gold-dark: #f0d59a;
+    --gold-light: #edd398;
+    --gold-wash: #221c11;
+    --uae-green: #2cc96d;
+    --uae-red: #f8485e;
+
+    --grid: #202937;
+    --axis: #7a889b;
+    --mark: #a2afc2;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
   }
 }
 
 @theme inline {
   --color-paper: var(--paper);
   --color-panel: var(--panel);
+  --color-panel-elevated: var(--panel-elevated);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-ink-faint: var(--ink-faint);
@@ -60,9 +92,16 @@
   --color-rent: var(--rent);
   --color-rent-wash: var(--rent-wash);
   --color-flag: var(--flag);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-gold-light: var(--gold-light);
+  --color-gold-wash: var(--gold-wash);
+  --color-uae-green: var(--uae-green);
+  --color-uae-red: var(--uae-red);
 
   --font-display: var(--font-display), Georgia, serif;
   --font-text: var(--font-text), system-ui, sans-serif;
+  --font-arabic: 'Tajawal', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
 }
 
 body {
@@ -70,10 +109,23 @@ body {
   color: var(--ink);
   font-family: var(--font-text), system-ui, sans-serif;
   font-feature-settings: "tnum" 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Fraunces reads best for display at a low optical size with a touch of wonk. */
-.font-display {
+/* Arabic RTL Typography */
+[dir="rtl"] {
+  font-family: var(--font-arabic), system-ui, sans-serif;
+  letter-spacing: 0 !important;
+}
+
+[dir="rtl"] .font-display {
+  font-family: var(--font-arabic), system-ui, sans-serif;
+  letter-spacing: 0 !important;
+  font-weight: 700;
+}
+
+/* Fraunces reads best for display at a low optical size with a touch of wonk (LTR). */
+[dir="ltr"] .font-display {
   font-variation-settings:
     "SOFT" 20,
     "WONK" 1,
@@ -85,7 +137,7 @@ body {
 :where(a, button, input, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--buy);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 /*
@@ -98,27 +150,41 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  height: 14px;
-  width: 14px;
+  height: 16px;
+  width: 16px;
   border-radius: 50%;
   background: var(--panel);
   border: 2px solid var(--buy);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.22);
   cursor: grab;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 input[type="range"]::-webkit-slider-thumb:active {
   cursor: grabbing;
+  transform: scale(1.25);
+  border-color: var(--gold);
 }
 
 input[type="range"]::-moz-range-thumb {
-  height: 14px;
-  width: 14px;
+  height: 16px;
+  width: 16px;
   border-radius: 50%;
   background: var(--panel);
   border: 2px solid var(--buy);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.22);
   cursor: grab;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.25);
+  border-color: var(--gold);
 }
 
 /* Firefox paints its own track over the inline gradient. */
@@ -132,6 +198,7 @@ input[type="range"]::-moz-range-track {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
