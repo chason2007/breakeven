@@ -26,16 +26,20 @@ export function minDownPaymentPct(propertyPrice: number): number {
  * Non-blocking checks. Inputs stay editable — the UI shows these inline so the
  * user can see *why* a figure is unrealistic without being stopped mid-typing.
  */
-export function validate(i: CalculatorInputs): Warning[] {
+export function validate(i: CalculatorInputs, lang: "en" | "ar" = "en"): Warning[] {
   const warnings: Warning[] = [];
   const minDown = minDownPaymentPct(i.propertyPrice);
+  const isAr = lang === "ar";
 
   if (i.downPaymentPct < minDown) {
     warnings.push({
       field: "downPaymentPct",
       level: "warn",
-      message:
-        i.propertyPrice > HIGH_VALUE_THRESHOLD
+      message: isAr
+        ? i.propertyPrice > HIGH_VALUE_THRESHOLD
+          ? `المصارف في الإمارات تشترط دفعة أولى 25% على الأقل للعقارات فوق 5 ملايين درهم.`
+          : `المصارف في الإمارات تشترط دفعة أولى 20% على الأقل للمنزل الأول.`
+        : i.propertyPrice > HIGH_VALUE_THRESHOLD
           ? `UAE lenders require at least ${minDown}% down above AED 5M.`
           : `UAE lenders require at least ${minDown}% down for an expat first home.`,
     });
@@ -45,7 +49,9 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "downPaymentPct",
       level: "warn",
-      message: "A down payment over 100% of the price isn't possible.",
+      message: isAr
+        ? "لا يمكن أن تتجاوز الدفعة الأولى 100% من سعر العقار."
+        : "A down payment over 100% of the price isn't possible.",
     });
   }
 
@@ -53,7 +59,9 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "tenureYears",
       level: "warn",
-      message: `UAE mortgage tenure is capped at ${MAX_TENURE_YEARS} years.`,
+      message: isAr
+        ? `الحد الأقصى للتمويل العقاري في الإمارات هو ${MAX_TENURE_YEARS} عاماً.`
+        : `UAE mortgage tenure is capped at ${MAX_TENURE_YEARS} years.`,
     });
   }
 
@@ -61,7 +69,7 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "tenureYears",
       level: "warn",
-      message: "Tenure must be at least 1 year.",
+      message: isAr ? "يجب أن تكون مدة التمويل سنة واحدة على الأقل." : "Tenure must be at least 1 year.",
     });
   }
 
@@ -69,7 +77,9 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "horizonYears",
       level: "info",
-      message: `The mortgage is paid off in year ${i.tenureYears}, so later years carry no mortgage.`,
+      message: isAr
+        ? `يتم سداد القرض بالكامل في السنة ${i.tenureYears}، وبالتالي السنوات التالية تخلو من أقساط الرهن.`
+        : `The mortgage is paid off in year ${i.tenureYears}, so later years carry no mortgage.`,
     });
   }
 
@@ -77,7 +87,9 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "rentIncreasePct",
       level: "info",
-      message: "Dubai's RERA index caps most increases at 20%.",
+      message: isAr
+        ? "مؤشر حاسبة الزيادة الإيجارية (ريرا) يحدد سقف الزيادة السنوية غالباً عند 20%."
+        : "Dubai's RERA index caps most increases at 20%.",
     });
   }
 
@@ -85,7 +97,9 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "appreciationPct",
       level: "info",
-      message: "Sustained double-digit appreciation is an optimistic assumption.",
+      message: isAr
+        ? "افتراض نمو سنوي مزدوج ومستمر لأسعار العقار يُعد توقعاً مفرط التفاؤل."
+        : "Sustained double-digit appreciation is an optimistic assumption.",
     });
   }
 
@@ -93,7 +107,7 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "propertySizeSqft",
       level: "warn",
-      message: "Size must be greater than zero.",
+      message: isAr ? "يجب أن تكون المساحة أكبر من صفر." : "Size must be greater than zero.",
     });
   }
 
@@ -101,7 +115,7 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "propertyPrice",
       level: "warn",
-      message: "Enter a property price above zero.",
+      message: isAr ? "يرجى إدخال سعر عقار أكبر من صفر." : "Enter a property price above zero.",
     });
   }
 
@@ -109,7 +123,7 @@ export function validate(i: CalculatorInputs): Warning[] {
     warnings.push({
       field: "annualRent",
       level: "warn",
-      message: "Enter the annual rent for a comparable home.",
+      message: isAr ? "يرجى إدخال الإيجار السنوي لعقار مماثل." : "Enter the annual rent for a comparable home.",
     });
   }
 
