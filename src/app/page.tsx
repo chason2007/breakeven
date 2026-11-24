@@ -6,11 +6,13 @@ import { ResultsSummary } from "@/components/ResultsSummary";
 import { CostChart } from "@/components/CostChart";
 import { DEFAULT_INPUTS } from "@/lib/defaults";
 import { calculate } from "@/lib/calc";
+import { validate } from "@/lib/validate";
 import type { CalculatorInputs } from "@/lib/types";
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const result = useMemo(() => calculate(inputs), [inputs]);
+  const warnings = useMemo(() => validate(inputs), [inputs]);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -24,7 +26,7 @@ export default function Home() {
 
       <div className="grid gap-8 lg:grid-cols-[360px_1fr]">
         <aside className="rounded-xl border border-black/10 p-5 dark:border-white/15">
-          <InputPanel value={inputs} onChange={setInputs} />
+          <InputPanel value={inputs} warnings={warnings} onChange={setInputs} />
         </aside>
 
         <section className="space-y-6">

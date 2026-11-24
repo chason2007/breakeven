@@ -7,9 +7,11 @@ Portfolio project: Next.js 16 (App Router) + TypeScript + Tailwind v4 + Recharts
 ## Layout
 - `src/lib/calc.ts` — pure financial engine (amortization, upfront fees, yearly net-cost series, breakeven). Keep it UI-free and testable.
 - `src/lib/types.ts` — input/result types. `src/lib/defaults.ts` — Dubai defaults.
-- `src/components/` — `InputPanel`, `ResultsSummary`, `CostChart`.
+- `src/lib/validate.ts` — non-blocking UAE rule checks (20/25% down, 25-yr tenure).
+- `src/lib/presets.ts` — Dubai / Abu Dhabi statutory fee presets.
+- `src/components/` — `InputPanel`, `NumberField` (slider + number pair), `ResultsSummary`, `CostChart`.
 - `src/app/page.tsx` — client page wiring state → `calculate()` → UI.
-- `src/lib/calc.test.ts` — Vitest suite for the engine. `npm test` (or `npm run test:watch`).
+- `src/lib/*.test.ts` — Vitest suites. `npm test` (or `npm run test:watch`).
 
 ## Model
 
@@ -38,6 +40,10 @@ within the horizon.
 Constants live in `calc.ts`: `VAT_RATE`, `DLD_MORTGAGE_ADMIN_FEE`, `EARLY_SETTLEMENT_PCT`,
 `EARLY_SETTLEMENT_CAP`.
 
+## Validation
+Rules are advisory, never blocking — `validate()` returns `Warning[]` which `InputPanel`
+renders inline under the relevant field. `warn` level is a UAE rule break (min down
+payment, 25-yr tenure cap, impossible figures); `info` level is a soft caution.
+
 ## Next steps (TODOs in code)
-- Input validation (20/25% min down, 25-yr max tenure), sliders, emirate presets
 - Breakeven ReferenceLine on chart, year-by-year table, shareable URL state
