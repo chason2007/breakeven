@@ -1,153 +1,16 @@
-import type { CalculatorResult } from "./types";
 import { EARLY_SETTLEMENT_CAP } from "./calc";
+import type { Language } from "./types";
 
-export type Language = "en" | "ar";
+export type { Language };
 
-export interface LocalizedVerdict {
-  kind: "buy" | "rent" | "tooClose";
-  headline: string;
-  detail: string;
-  advantage: number;
-  badgeLabel: string;
-}
-
-export function formatCompactCurrency(n: number, lang: Language = "en"): string {
-  const abs = Math.abs(n);
-  const sign = n < 0 ? (lang === "ar" ? "-" : "-") : "";
-
-  if (lang === "ar") {
-    if (abs >= 1_000_000) {
-      const val = (abs / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1);
-      return `${sign}${val} مليون د.إ`;
-    }
-    if (abs >= 1_000) {
-      return `${sign}${Math.round(abs / 1_000)} ألف د.إ`;
-    }
-    return `${sign}${Math.round(abs)} د.إ`;
-  }
-
-  // English
-  if (abs >= 1_000_000) {
-    return `${sign}AED ${(abs / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1)}M`;
-  }
-  if (abs >= 1_000) {
-    return `${sign}AED ${Math.round(abs / 1_000)}k`;
-  }
-  return `${sign}AED ${Math.round(abs)}`;
-}
-
-export function formatCurrency(n: number, lang: Language = "en"): string {
-  const formatter = new Intl.NumberFormat(lang === "ar" ? "ar-AE" : "en-AE", {
-    style: "currency",
-    currency: "AED",
-    maximumFractionDigits: 0,
-  });
-  return formatter.format(n);
-}
-
-export function getLocalizedVerdict(
-  result: CalculatorResult,
-  horizonYears: number,
-  lang: Language = "en"
-): LocalizedVerdict {
-  const last = result.years.at(-1);
-
-  if (!last) {
-    return {
-      kind: "tooClose",
-      headline: lang === "ar" ? "لا توجد بيانات كافية" : "Nothing to compare yet",
-      detail:
-        lang === "ar"
-          ? "يرجى تحديد أفق زمني للمقارنة لا يقل عن سنة واحدة."
-          : "Set a comparison horizon of at least one year.",
-      advantage: 0,
-      badgeLabel: lang === "ar" ? "غير محدد" : "Indeterminate",
-    };
-  }
-
-  const advantage = last.rentNetCost - last.buyNetCost;
-  const scale = Math.max(Math.abs(last.rentNetCost), Math.abs(last.buyNetCost), 1);
-  const breakeven = result.breakevenYear;
-  const isClose = Math.abs(advantage) / scale < 0.02;
-
-  const yearsStr = (n: number) => {
-    if (lang === "ar") {
-      if (n === 1) return "سنة واحدة";
-      if (n === 2) return "سنتين";
-      if (n >= 3 && n <= 10) return `${n} سنوات`;
-      return `${n} سنة`;
-    }
-    return `${n} ${n === 1 ? "year" : "years"}`;
-  };
-
-  if (isClose) {
-    return {
-      kind: "tooClose",
-      headline: lang === "ar" ? "النتيجتان متقاربتان جداً" : "Too close to call",
-      detail:
-        lang === "ar"
-          ? `خلال ${yearsStr(horizonYears)} الفرق بين الخيارين أقل من 2%، لذا يتوقف القرار الفعلي على مدة بقائك المتوقعة في العقار.`
-          : `Over ${yearsStr(horizonYears)} the two options land within 2% of each other, so the choice comes down to how long you'll really stay.`,
-      advantage,
-      badgeLabel: lang === "ar" ? "خيارات متوازنة" : "Too Close",
-    };
-  }
-
-  if (advantage > 0 && breakeven !== null) {
-    return {
-      kind: "buy",
-      headline:
-        lang === "ar"
-          ? breakeven === 1
-            ? "الشراء يتفوق على الإيجار من السنة الأولى"
-            : `الشراء يتفوق على الإيجار بعد ${yearsStr(breakeven)}`
-          : breakeven === 1
-            ? "Buying beats renting from year one"
-            : `Buying beats renting after ${yearsStr(breakeven)}`,
-      detail:
-        lang === "ar"
-          ? `عند البقاء لكامل فترة ${yearsStr(horizonYears)}، يحقق لك الشراء وفراً مالياً يقدّر بحوالي ${formatCompactCurrency(advantage, "ar")}.`
-          : `Stay the full ${yearsStr(horizonYears)} and buying leaves you better off by about ${formatCompactCurrency(advantage, "en")}.`,
-      advantage,
-      badgeLabel: lang === "ar" ? "يُنصح بالشراء" : "Favors Buying",
-    };
-  }
-
-  if (advantage > 0) {
-    return {
-      kind: "buy",
-      headline:
-        lang === "ar"
-          ? `الشراء أفضل على مدى ${yearsStr(horizonYears)}`
-          : `Buying wins over ${yearsStr(horizonYears)}`,
-      detail:
-        lang === "ar"
-          ? `ينتهي الشراء بأقل تكلفة بنحو ${formatCompactCurrency(advantage, "ar")}، على الرغم من أن الإيجار قد يكون أقل كلفة في البداية.`
-          : `Buying ends about ${formatCompactCurrency(advantage, "en")} cheaper, though renting is ahead for most of the period.`,
-      advantage,
-      badgeLabel: lang === "ar" ? "يُنصح بالشراء" : "Favors Buying",
-    };
-  }
-
-  return {
-    kind: "rent",
-    headline:
-      lang === "ar"
-        ? `الإيجار يتفوق على مدى ${yearsStr(horizonYears)}`
-        : `Renting wins over ${yearsStr(horizonYears)}`,
-    detail:
-      lang === "ar"
-        ? `الشراء لا يعوّض تكاليفه الأولية خلال ${yearsStr(horizonYears)}، حيث يكلّف نحو ${formatCompactCurrency(-advantage, "ar")} أكثر بعد احتساب الرسوم وعوائد الاستثمار البديلة.`
-        : `Buying never catches up within ${yearsStr(horizonYears)} — it ends about ${formatCompactCurrency(-advantage, "en")} more expensive once fees and opportunity cost are counted.`,
-    advantage,
-    badgeLabel: lang === "ar" ? "يُنصح بالإيجار" : "Favors Renting",
-  };
-}
-
+/**
+ * All user-facing copy, in both languages. Components read it through
+ * `useLanguage().t`, so a missing Arabic string is a type error rather than an
+ * English string leaking into an RTL page.
+ */
 export const DICTIONARY = {
   en: {
     appName: "BREAKEVEN",
-    appTagline: "Rent vs Buy Calculator",
     heroTitle: "Rent or buy in the UAE?",
     heroSubtitle:
       "Owning costs more than the mortgage. This compares both sides on true net cost — transfer and agent fees, service charges, what it takes to sell again, and the return you give up on the cash you tie up.",
@@ -168,23 +31,17 @@ export const DICTIONARY = {
     chartCaption: "Cumulative net cost in AED if you exit in that year. Lower is better.",
     chartBuySeries: "Buying",
     chartRentSeries: "Renting",
-    chartBreakevenLabel: "Breakeven",
     yearLabel: "Year",
     methodologyHeading: "How this is calculated in the UAE",
     methodologyDisclaimer:
       "Fee rates follow published UAE norms and Central Bank regulations; every parameter is editable. This is an analytical tool, not financial advice — verify current rates with your bank, DLD, or ADREC prior to committing.",
     quickPresets: "Quick values",
     statutoryBadge: "Statutory UAE Rules Applied",
-    dubaiLandDept: "Dubai Land Dept (DLD)",
-    abuDhabiMun: "Abu Dhabi Real Estate Centre (ADREC)",
-    uaeCentralBank: "UAE Central Bank (LTV Rules)",
     years: "years",
     year: "year",
     never: "Never in horizon",
     modeSimple: "Simple",
     modeAdvanced: "Advanced",
-    simpleModeBadge: "Essential",
-    advancedModeBadge: "All 21 Parameters",
     simpleModeNotice: "16 statutory fees & running costs use official UAE market defaults (DLD 4%, mortgage registration 0.25%, service charges, Ejari, DEWA).",
     customizeAll: "Customize all parameters",
     coreInputsSection: "Core parameters",
@@ -296,7 +153,6 @@ export const DICTIONARY = {
   },
   ar: {
     appName: "دار الميزان",
-    appTagline: "حاسبة التملك والإيجار",
     heroTitle: "الشراء أم الإيجار في الإمارات؟",
     heroSubtitle:
       "تكلفة التملك العقاري تتجاوز مجرد أقساط الرهن. هذه الأداة تقارن بين الخيارين وفق التكلفة الصافية الفعلية — شاملة رسوم التسجيل العقاري والوسطاء، رسوم الخدمات والصيانة، تكاليف إعادة البيع، والعائد الضائع على السيولة المستثمرة.",
@@ -317,23 +173,17 @@ export const DICTIONARY = {
     chartCaption: "التكلفة التراكمية الصافية بالدرهم عند التخارج في تلك السنة. القيمة الأقل هي الأفضل.",
     chartBuySeries: "التملك (الشراء)",
     chartRentSeries: "الإيجار",
-    chartBreakevenLabel: "نقطة التعادل",
     yearLabel: "السنة",
     methodologyHeading: "كيف يتم الحساب وفق القوانين والأنظمة الإماراتية؟",
     methodologyDisclaimer:
       "تعتمد الرسوم على اللوائح الصادرة عن دائرة الأراضي والأملاك في دبي والبلديات ومصرف الإمارات المركزي. هذه أداة تحليلية وليست استشارة مالية — يُرجى التحقق من الرسوم المحدثة مع المصرف والجهات المختصة قبل اتخاذ القرار.",
     quickPresets: "قيم سريعة",
     statutoryBadge: "وفق لوائح وقوانين دولة الإمارات",
-    dubaiLandDept: "أراضي دبي (DLD)",
-    abuDhabiMun: "مركز أبوظبي العقاري (ADREC)",
-    uaeCentralBank: "مصرف الإمارات المركزي (الحد الائتماني)",
     years: "سنوات",
     year: "سنة",
     never: "لا تتحقق خلال المدة",
     modeSimple: "مبسط",
     modeAdvanced: "متقدم",
-    simpleModeBadge: "المدخلات الأساسية",
-    advancedModeBadge: "كافة الـ 21 معياراً",
     simpleModeNotice: "تم ضبط 16 رسماً وتكلفة تشغيلية تلقائياً وفق معايير السوق الرسمية في الإمارات (أراضي دبي 4%، تسجيل الرهن 0.25%، رسوم الخدمات، إيجاري، ديوا).",
     customizeAll: "تخصيص كافة المعايير",
     coreInputsSection: "المدخلات الرئيسية",

@@ -7,7 +7,6 @@ export interface EmiratePreset {
   label: string;
   /** Fields the preset overrides; everything else is left as the user set it. */
   overrides: Partial<CalculatorInputs>;
-  note: string;
 }
 
 export const EMIRATE_PRESETS: EmiratePreset[] = [
@@ -19,7 +18,6 @@ export const EMIRATE_PRESETS: EmiratePreset[] = [
       ejariFeeAnnual: 220,
       dewaHousingFeePct: 5,
     },
-    note: "DLD transfer fee 4%, Ejari AED 220/yr, 5% municipality housing fee.",
   },
   {
     id: "abuDhabi",
@@ -29,7 +27,6 @@ export const EMIRATE_PRESETS: EmiratePreset[] = [
       ejariFeeAnnual: 0,
       dewaHousingFeePct: 3,
     },
-    note: "Transfer fee 2%, no Ejari equivalent, 3% municipality housing fee.",
   },
 ];
 

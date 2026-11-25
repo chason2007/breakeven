@@ -1,4 +1,5 @@
-import type { CalculatorResult } from "./types";
+import { formatCompactPhrase } from "./format";
+import type { CalculatorResult, Language } from "./types";
 
 export type VerdictKind = "buy" | "rent" | "tooClose";
 
@@ -15,16 +16,34 @@ export interface Verdict {
 /** Within this fraction of the larger figure, the two options are a coin toss. */
 const TOO_CLOSE_FRACTION = 0.02;
 
-const years = (n: number) => `${n} ${n === 1 ? "year" : "years"}`;
+/** Arabic counts the first two numbers with their own forms, then switches plural. */
+function years(n: number, lang: Language): string {
+  if (lang === "en") return `${n} ${n === 1 ? "year" : "years"}`;
+  if (n === 1) return "سنة واحدة";
+  if (n === 2) return "سنتين";
+  return n <= 10 ? `${n} سنوات` : `${n} سنة`;
+}
 
-export function verdict(result: CalculatorResult, horizonYears: number): Verdict {
+/**
+ * The headline copy for a result. The whole decision the page exists to deliver
+ * is this one function, so both languages live together — a new phrasing has to
+ * be written in both to land here.
+ */
+export function verdict(
+  result: CalculatorResult,
+  horizonYears: number,
+  lang: Language = "en",
+): Verdict {
   const last = result.years.at(-1);
+  const ar = lang === "ar";
 
   if (!last) {
     return {
       kind: "tooClose",
-      headline: "Nothing to compare yet",
-      detail: "Set a comparison horizon of at least one year.",
+      headline: ar ? "لا توجد بيانات كافية" : "Nothing to compare yet",
+      detail: ar
+        ? "يرجى تحديد أفق زمني للمقارنة لا يقل عن سنة واحدة."
+        : "Set a comparison horizon of at least one year.",
       advantage: 0,
     };
   }
@@ -32,12 +51,16 @@ export function verdict(result: CalculatorResult, horizonYears: number): Verdict
   const advantage = last.rentNetCost - last.buyNetCost;
   const scale = Math.max(Math.abs(last.rentNetCost), Math.abs(last.buyNetCost), 1);
   const breakeven = result.breakevenYear;
+  const horizon = years(horizonYears, lang);
+  const gap = (n: number) => formatCompactPhrase(n, lang);
 
   if (Math.abs(advantage) / scale < TOO_CLOSE_FRACTION) {
     return {
       kind: "tooClose",
-      headline: "Too close to call",
-      detail: `Over ${years(horizonYears)} the two options land within 2% of each other, so the choice comes down to how long you'll really stay.`,
+      headline: ar ? "النتيجتان متقاربتان جداً" : "Too close to call",
+      detail: ar
+        ? `خلال ${horizon} الفرق بين الخيارين أقل من 2%، لذا يتوقف القرار الفعلي على مدة بقائك المتوقعة في العقار.`
+        : `Over ${horizon} the two options land within 2% of each other, so the choice comes down to how long you'll really stay.`,
       advantage,
     };
   }
@@ -45,11 +68,16 @@ export function verdict(result: CalculatorResult, horizonYears: number): Verdict
   if (advantage > 0 && breakeven !== null) {
     return {
       kind: "buy",
-      headline:
-        breakeven === 1
+      headline: ar
+        ? breakeven === 1
+          ? "الشراء يتفوق على الإيجار من السنة الأولى"
+          : `الشراء يتفوق على الإيجار بعد ${years(breakeven, lang)}`
+        : breakeven === 1
           ? "Buying beats renting from year one"
-          : `Buying beats renting after ${years(breakeven)}`,
-      detail: `Stay the full ${years(horizonYears)} and buying leaves you better off by about ${compact(advantage)}.`,
+          : `Buying beats renting after ${years(breakeven, lang)}`,
+      detail: ar
+        ? `عند البقاء لكامل فترة ${horizon}، يحقق لك الشراء وفراً مالياً يقدّر بحوالي ${gap(advantage)}.`
+        : `Stay the full ${horizon} and buying leaves you better off by about ${gap(advantage)}.`,
       advantage,
     };
   }
@@ -59,24 +87,20 @@ export function verdict(result: CalculatorResult, horizonYears: number): Verdict
     // series is non-monotonic, so report it plainly rather than quoting a year.
     return {
       kind: "buy",
-      headline: `Buying wins over ${years(horizonYears)}`,
-      detail: `Buying ends about ${compact(advantage)} cheaper, though renting is ahead for most of the period.`,
+      headline: ar ? `الشراء أفضل على مدى ${horizon}` : `Buying wins over ${horizon}`,
+      detail: ar
+        ? `ينتهي الشراء بأقل تكلفة بنحو ${gap(advantage)}، على الرغم من أن الإيجار قد يكون أقل كلفة في البداية.`
+        : `Buying ends about ${gap(advantage)} cheaper, though renting is ahead for most of the period.`,
       advantage,
     };
   }
 
   return {
     kind: "rent",
-    headline: `Renting wins over ${years(horizonYears)}`,
-    detail: `Buying never catches up within ${years(horizonYears)} — it ends about ${compact(-advantage)} more expensive once fees and opportunity cost are counted.`,
+    headline: ar ? `الإيجار يتفوق على مدى ${horizon}` : `Renting wins over ${horizon}`,
+    detail: ar
+      ? `الشراء لا يعوّض تكاليفه الأولية خلال ${horizon}، حيث يكلّف نحو ${gap(-advantage)} أكثر بعد احتساب الرسوم وعوائد الاستثمار البديلة.`
+      : `Buying never catches up within ${horizon} — it ends about ${gap(-advantage)} more expensive once fees and opportunity cost are counted.`,
     advantage,
   };
-}
-
-/** AED 1.2M / AED 340k — readable inside a sentence. */
-function compact(n: number): string {
-  const abs = Math.abs(n);
-  if (abs >= 1_000_000) return `AED ${(n / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1)}M`;
-  if (abs >= 1_000) return `AED ${Math.round(n / 1_000)}k`;
-  return `AED ${Math.round(n)}`;
 }

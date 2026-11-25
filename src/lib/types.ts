@@ -1,5 +1,7 @@
 // All money values are AED. Rates are annual percentages (e.g. 4.5 = 4.5%).
 
+export type Language = "en" | "ar";
+
 export interface CalculatorInputs {
   // Buy side
   propertyPrice: number;
